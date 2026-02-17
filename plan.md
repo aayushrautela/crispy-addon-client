@@ -1,4 +1,4 @@
-# Plan: Modern TypeScript Rewrite (stremio-addon-client)
+# Plan: Modern TypeScript Rewrite (crispy-addon-client)
 
 This repo will be rewritten into a modern, production-ready add-on client library for Web + React Native + Node 18+, while preserving Stremio add-on protocol v3 behavior and the upstream public API surface (manifest loading + resource calls).
 

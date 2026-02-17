@@ -1,4 +1,4 @@
-import { fromDescriptor } from "stremio-addon-client";
+import { fromDescriptor } from "crispy-addon-client";
 
 export async function loadMeta() {
   const addon = await fromDescriptor({

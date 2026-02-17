@@ -1,6 +1,8 @@
-# stremio-addon-client
+# crispy-addon-client
 
-Modern, TypeScript-first Stremio add-on client for protocol v3.
+Modern, TypeScript-first client for the Stremio add-on protocol (v3).
+
+Based on (and API-inspired by) the upstream `stremio-addon-client`.
 
 - Works in Web apps, React Native, and Node 18+.
 - Promise-first API with optional callback adapter.
@@ -17,13 +19,13 @@ Modern, TypeScript-first Stremio add-on client for protocol v3.
 ## Install
 
 ```bash
-npm install stremio-addon-client
+npm install crispy-addon-client
 ```
 
 ## Quick start (Web / Node)
 
 ```ts
-import { detectFromURL } from "stremio-addon-client";
+import { detectFromURL } from "crispy-addon-client";
 
 const detected = await detectFromURL("https://v3-cinemeta.strem.io/manifest.json");
 
@@ -37,7 +39,7 @@ if (detected.addon) {
 ## React Native usage
 
 ```ts
-import { fromDescriptor } from "stremio-addon-client";
+import { fromDescriptor } from "crispy-addon-client";
 
 const addon = await fromDescriptor({
   manifest: {
@@ -85,7 +87,7 @@ const meta = await addon.get("meta", "movie", "tt0111161");
 ## Error handling
 
 ```ts
-import { ERR_NOT_FOUND, isAddonClientError } from "stremio-addon-client";
+import { ERR_NOT_FOUND, isAddonClientError } from "crispy-addon-client";
 
 try {
   await addon.get("meta", "movie", "tt123");
@@ -99,7 +101,7 @@ try {
 ## Optional lint hook for `detectFromURL`
 
 ```ts
-import { detectFromURL } from "stremio-addon-client";
+import { detectFromURL } from "crispy-addon-client";
 
 const result = await detectFromURL("https://example.com/manifest.json", {
   lint: async ({ kind, value }) => {
@@ -113,9 +115,9 @@ const result = await detectFromURL("https://example.com/manifest.json", {
 ## Tree-shakable transport entrypoints
 
 ```ts
-import { HttpTransport } from "stremio-addon-client/transports/http";
-import { IpfsShimTransport } from "stremio-addon-client/transports/ipfsShim";
-import { LegacyTransport } from "stremio-addon-client/transports/legacy";
+import { HttpTransport } from "crispy-addon-client/transports/http";
+import { IpfsShimTransport } from "crispy-addon-client/transports/ipfsShim";
+import { LegacyTransport } from "crispy-addon-client/transports/legacy";
 ```
 
 ## Development
