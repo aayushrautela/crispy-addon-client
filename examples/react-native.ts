@@ -1,4 +1,4 @@
-import { fromDescriptor } from "crispy-addon-client";
+import { fromDescriptor } from "@crispy-streaming/crispy-addon-client";
 
 export async function loadMeta() {
   const addon = await fromDescriptor({

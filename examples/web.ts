@@ -1,4 +1,4 @@
-import { detectFromURL } from "crispy-addon-client";
+import { detectFromURL } from "@crispy-streaming/crispy-addon-client";
 
 async function run(): Promise<void> {
   const detected = await detectFromURL("https://v3-cinemeta.strem.io/manifest.json");

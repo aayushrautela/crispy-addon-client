@@ -1,5 +1,5 @@
 {
-  "name": "crispy-addon-client",
+  "name": "@crispy-streaming/crispy-addon-client",
   "version": "2.0.0",
   "description": "Modern TypeScript client for the Stremio add-on protocol (v3) for Web, React Native, and Node 18+",
   "type": "module",
@@ -51,6 +51,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepack": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "repository": {
     "type": "git",
