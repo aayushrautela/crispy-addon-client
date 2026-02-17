@@ -1,6 +1,7 @@
 import { ERR_BAD_HTTP, ERR_NOT_FOUND, createError } from "../core/errors";
 import { fetchWithCache, getFetch, parseJsonResponse } from "../core/fetch";
 import { assertAddonManifest } from "../core/manifest";
+import { mapURL } from "../core/mapURL";
 import { stringifyRequest } from "../core/stringifyRequest";
 import { getProtocol, toURL } from "../core/url";
 import type {
@@ -26,18 +27,19 @@ export class HttpTransport implements AddonTransport {
   private readonly fetchImpl: FetchLike;
 
   constructor(url: string, options: TransportOptions = {}) {
-    this.url = url;
+    this.url = mapURL(url);
     this.fetchImpl = getFetch(options.fetch);
   }
 
   static isValidURL(url: string): boolean {
     try {
-      const protocol = getProtocol(url);
+      const mappedUrl = mapURL(url);
+      const protocol = getProtocol(mappedUrl);
       if (!isHttpLikeProtocol(protocol)) {
         return false;
       }
 
-      return endsWithManifestJson(url);
+      return endsWithManifestJson(mappedUrl);
     } catch {
       return false;
     }
@@ -60,8 +62,20 @@ export class HttpTransport implements AddonTransport {
       });
     }
 
-    const requestUrl = this.url.replace(/\/manifest\.json$/, stringifyRequest(args));
-    return this.requestJson<unknown>(requestUrl);
+    const requestPath = stringifyRequest(args);
+    const parsed = toURL(this.url);
+
+    if (!parsed.pathname.endsWith("/manifest.json")) {
+      throw createError(ERR_BAD_HTTP, {
+        message: "Transport URL must end with /manifest.json",
+        details: { transportUrl: this.url },
+      });
+    }
+
+    parsed.pathname = parsed.pathname.slice(0, -"/manifest.json".length) + requestPath;
+    parsed.hash = "";
+
+    return this.requestJson<unknown>(parsed.toString());
   }
 
   private async requestJson<T>(url: string): Promise<TransportResponse<T>> {

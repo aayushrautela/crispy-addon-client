@@ -8,6 +8,7 @@ import {
 } from "../core/errors";
 import { fetchWithCache, getFetch, parseJsonResponse } from "../core/fetch";
 import { assertAddonManifest } from "../core/manifest";
+import { mapURL } from "../core/mapURL";
 import { getProtocol, toURL } from "../core/url";
 import { mapLegacyManifest, mapLegacyRequest } from "./legacyMapper";
 import type {
@@ -39,18 +40,19 @@ export class LegacyTransport implements AddonTransport {
   private readonly fetchImpl: FetchLike;
 
   constructor(url: string, options: TransportOptions = {}) {
-    this.url = url;
+    this.url = mapURL(url);
     this.fetchImpl = getFetch(options.fetch);
   }
 
   static isValidURL(url: string): boolean {
     try {
-      const protocol = getProtocol(url);
+      const mappedUrl = mapURL(url);
+      const protocol = getProtocol(mappedUrl);
       if (!isHttpLikeProtocol(protocol)) {
         return false;
       }
 
-      const path = toURL(url).pathname;
+      const path = toURL(mappedUrl).pathname;
       return path.endsWith("/stremio/v1") || path.endsWith("/stremio/v1/stremioget");
     } catch {
       return false;
@@ -99,8 +101,20 @@ export class LegacyTransport implements AddonTransport {
       params,
     });
 
-    const baseUrl = normalizeBaseUrl(this.url);
-    const requestUrl = `${baseUrl}/q.json?b=${encodeBase64Utf8(payload)}`;
+    const parsedBaseUrl = toURL(normalizeBaseUrl(this.url));
+    parsedBaseUrl.hash = "";
+
+    if (parsedBaseUrl.pathname.endsWith("/")) {
+      parsedBaseUrl.pathname = parsedBaseUrl.pathname.slice(0, -1);
+    }
+
+    parsedBaseUrl.pathname = `${parsedBaseUrl.pathname}/q.json`;
+
+    const searchParams = new URLSearchParams(parsedBaseUrl.search);
+    searchParams.set("b", encodeBase64Utf8(payload));
+    parsedBaseUrl.search = searchParams.toString();
+
+    const requestUrl = parsedBaseUrl.toString();
     const { response, cache } = await fetchWithCache(this.fetchImpl, requestUrl);
 
     if (response.status !== 200) {

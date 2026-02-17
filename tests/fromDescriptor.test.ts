@@ -30,6 +30,36 @@ describe("fromDescriptor", () => {
     expect(addon.manifest.name).toBe(originalName);
   });
 
+  it("normalizes stremio:// transport URLs to https", async () => {
+    const addon = await fromDescriptor({
+      manifest: { id: "org.test.scheme.stremio", resources: ["meta"], types: ["movie"] },
+      transportUrl: "stremio://example.com/manifest.json",
+    });
+
+    expect(addon.transportUrl).toBe("https://example.com/manifest.json");
+    expect(addon.toDescriptor().transportUrl).toBe("https://example.com/manifest.json");
+  });
+
+  it("normalizes crispy:// transport URLs to https", async () => {
+    const addon = await fromDescriptor({
+      manifest: { id: "org.test.scheme.crispy", resources: ["meta"], types: ["movie"] },
+      transportUrl: "crispy://example.com/manifest.json",
+    });
+
+    expect(addon.transportUrl).toBe("https://example.com/manifest.json");
+    expect(addon.toDescriptor().transportUrl).toBe("https://example.com/manifest.json");
+  });
+
+  it("keeps http:// transport URLs", async () => {
+    const addon = await fromDescriptor({
+      manifest: { id: "org.test.scheme.http", resources: ["meta"], types: ["movie"] },
+      transportUrl: "http://example.com/manifest.json",
+    });
+
+    expect(addon.transportUrl).toBe("http://example.com/manifest.json");
+    expect(addon.toDescriptor().transportUrl).toBe("http://example.com/manifest.json");
+  });
+
   it("throws ERR_NO_TRANSPORT for unsupported transport URLs", async () => {
     await expect(
       fromDescriptor({

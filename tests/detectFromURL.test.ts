@@ -15,6 +15,48 @@ describe("detectFromURL", () => {
     });
   });
 
+  it("accepts stremio:// manifest URLs", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(String(input)).toBe("https://example.com/manifest.json");
+      return jsonResponse({ id: "org.test.stremio", resources: ["meta"], types: ["movie"] });
+    });
+
+    const result = await detectFromURL("stremio://example.com/manifest.json", {
+      fetch: fetchMock as FetchLike,
+    });
+
+    expect(result.addon?.manifest.id).toBe("org.test.stremio");
+    expect(result.addon?.transportUrl).toBe("https://example.com/manifest.json");
+  });
+
+  it("accepts crispy:// manifest URLs", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(String(input)).toBe("https://example.com/manifest.json");
+      return jsonResponse({ id: "org.test.crispy", resources: ["meta"], types: ["movie"] });
+    });
+
+    const result = await detectFromURL("crispy://example.com/manifest.json", {
+      fetch: fetchMock as FetchLike,
+    });
+
+    expect(result.addon?.manifest.id).toBe("org.test.crispy");
+    expect(result.addon?.transportUrl).toBe("https://example.com/manifest.json");
+  });
+
+  it("keeps http:// manifest URLs", async () => {
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      expect(String(input)).toBe("http://example.com/manifest.json");
+      return jsonResponse({ id: "org.test.http", resources: ["meta"], types: ["movie"] });
+    });
+
+    const result = await detectFromURL("http://example.com/manifest.json", {
+      fetch: fetchMock as FetchLike,
+    });
+
+    expect(result.addon?.manifest.id).toBe("org.test.http");
+    expect(result.addon?.transportUrl).toBe("http://example.com/manifest.json");
+  });
+
   it("detects add-on from direct manifest URL", async () => {
     const fetchMock = vi.fn(async () =>
       jsonResponse({ id: "org.test.direct", resources: ["meta"], types: ["movie"] }),

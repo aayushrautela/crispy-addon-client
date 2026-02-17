@@ -40,6 +40,23 @@ describe("HttpTransport", () => {
     expect(calledUrls[0]).toBe("https://example.com/catalog/series/top/search=the%20office&skip=2.json");
   });
 
+  it("supports manifest URLs with query strings", async () => {
+    const calledUrls: string[] = [];
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      calledUrls.push(String(input));
+      return jsonResponse({ metas: [] });
+    });
+
+    const transport = new HttpTransport("https://example.com/manifest.json?token=abc", {
+      fetch: fetchMock as FetchLike,
+    });
+
+    await transport.get(["catalog", "series", "top", { skip: 0 }]);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(calledUrls[0]).toBe("https://example.com/catalog/series/top/skip=0.json?token=abc");
+  });
+
   it("maps 404 to ERR_NOT_FOUND", async () => {
     const fetchMock = vi.fn(async () => jsonResponse({ error: true }, { status: 404 }));
     const transport = new HttpTransport(TRANSPORT_URL, { fetch: fetchMock as FetchLike });

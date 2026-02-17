@@ -10,8 +10,16 @@ describe("mapURL", () => {
     expect(mapURL("//test/")).toBe("https://test/");
   });
 
-  it("maps http to https for non-local hosts", () => {
-    expect(mapURL("http://test/")).toBe("https://test/");
+  it("keeps http for non-local hosts", () => {
+    expect(mapURL("http://test/")).toBe("http://test/");
+  });
+
+  it("maps stremio protocol to https", () => {
+    expect(mapURL("stremio://example.com/manifest.json")).toBe("https://example.com/manifest.json");
+  });
+
+  it("maps crispy protocol to https", () => {
+    expect(mapURL("crispy://example.com/manifest.json")).toBe("https://example.com/manifest.json");
   });
 
   it("keeps localhost protocol and normalizes hostname", () => {

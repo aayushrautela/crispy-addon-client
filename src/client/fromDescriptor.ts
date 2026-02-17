@@ -1,5 +1,6 @@
 import { ERR_NO_TRANSPORT, createError } from "../core/errors";
 import { assertAddonManifest } from "../core/manifest";
+import { mapURL } from "../core/mapURL";
 import type { AddonDescriptor, AddonTransportConstructor, FromDescriptorOptions } from "../core/types";
 import { HttpTransport } from "../transports/http";
 import { IpfsShimTransport } from "../transports/ipfsShim";
@@ -16,17 +17,20 @@ export async function fromDescriptor(
   descriptor: AddonDescriptor,
   options: FromDescriptorOptions = {},
 ): Promise<AddonClient> {
-  const transportUrl = descriptor.transportUrl;
+  const transportUrl = mapURL(descriptor.transportUrl);
   const Transport = TRANSPORTS.find((transport) => transport.isValidURL(transportUrl));
 
   if (!Transport) {
     throw createError(ERR_NO_TRANSPORT, {
-      details: { transportUrl: descriptor.transportUrl },
+      details: {
+        transportUrl: descriptor.transportUrl,
+        mappedTransportUrl: transportUrl,
+      },
     });
   }
 
   const transport = new Transport(transportUrl, options);
-  const manifest = assertAddonManifest(descriptor.manifest, descriptor.transportUrl);
+  const manifest = assertAddonManifest(descriptor.manifest, transportUrl);
 
   return new AddonClient(manifest, transport, descriptor.flags ?? {});
 }

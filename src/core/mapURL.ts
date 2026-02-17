@@ -7,7 +7,12 @@ export function mapURL(inputUrl: string): string {
     return inputUrl;
   }
 
-  const parsedUrl = toURL(inputUrl);
+  const normalizedInputUrl =
+    protocol === "stremio:" || protocol === "crispy:"
+      ? inputUrl.replace(/^(stremio|crispy):/i, "https:")
+      : inputUrl;
+
+  const parsedUrl = toURL(normalizedInputUrl);
 
   if (isLocalHostname(parsedUrl.hostname)) {
     if (parsedUrl.hostname === "localhost") {
@@ -15,10 +20,6 @@ export function mapURL(inputUrl: string): string {
     }
 
     return parsedUrl.toString();
-  }
-
-  if (parsedUrl.protocol === "http:") {
-    parsedUrl.protocol = "https:";
   }
 
   return parsedUrl.toString();

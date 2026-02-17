@@ -13,6 +13,8 @@ Based on (and API-inspired by) the upstream `stremio-addon-client`.
 
 - Errors are real `Error` instances (`AddonClientError`) with string codes (for example, `ERR_NOT_FOUND`).
 - `detectFromURL()` does not run `stremio-addon-linter` by default. Linting is an optional hook.
+- `stremio://` and `crispy://` URLs are accepted as input and normalized to `https://`.
+- `http://` add-on URLs are kept as-is (no forced upgrade to `https://`).
 - IPFS support is provided through an HTTP gateway shim (`ipfs://` / `ipns://` URLs are preserved as `transportUrl`).
 - Legacy transport behavior is preserved for `/stremio/v1` and `/stremio/v1/stremioget` endpoints.
 
